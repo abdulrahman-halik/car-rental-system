@@ -1,0 +1,101 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/components/owner/NavbarOwner.jsx
+  3:10  error  'dummyCarData' is defined but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  6:11  error  'user' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/components/owner/Sidebar.jsx
+  62:117  error  Unexpected constant condition  no-constant-condition
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/pages/CarDetails.jsx
+  18:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  16 |
+  17 |     useEffect(() => {
+> 18 |         setCar(dummyCarData.find(car => car._id === id));
+     |         ^^^^^^ Avoid calling setState() directly within an effect
+  19 |     }, [id]);
+  20 |
+  21 |     return car ? (  react-hooks/set-state-in-effect
+  70:44  error  'label' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/pages/MyBookings.jsx
+  14:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  12 |
+  13 |     useEffect(() => {
+> 14 |         fetchMyBookings();
+     |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |     }, []);
+  16 |
+  17 |     return (  react-hooks/set-state-in-effect
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/pages/owner/Dashboard.jsx
+   2:18  error  'dummyCarData' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+  25:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  23 |
+  24 |     useEffect(() => {
+> 25 |         setdata(dummyDashboardData);
+     |         ^^^^^^^ Avoid calling setState() directly within an effect
+  26 |     }, []);
+  27 |
+  28 |     return (  react-hooks/set-state-in-effect
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/pages/owner/ManageBookings.jsx
+  15:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  13 |
+  14 |     useEffect(() => {
+> 15 |         fetchOwnerBookings();
+     |         ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |     }, []);
+  17 |     return (
+  18 |         <div className="w-full">  react-hooks/set-state-in-effect
+
+/home/abdul/projects2/RENT-A-CAR/frontend/src/pages/owner/ManageCars.jsx
+  15:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  13 |
+  14 |     useEffect(() => {
+> 15 |         fetchOwnerCars();
+     |         ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |     }, []);
+  17 |
+  18 |     return (  react-hooks/set-state-in-effect
+
+✖ 10 problems (10 errors, 0 warnings)
+
