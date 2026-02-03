@@ -1,18 +1,40 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { dummyCarData, assets } from '../assets/assets';
+import { assets } from '../assets/assets';
+import { toast } from 'react-hot-toast';
 import Loader from '../components/Loader';
+import { useAppContext } from '../context/AppContext';
+import { useState, useEffect } from 'react';
 
 const CarDetails = () => {
-
     const { id } = useParams();
+    const { cars, axios, pickupDate, setPickupDate, returnDate, setReturnDate } = useAppContext();
     const navigate = useNavigate();
     const currency = import.meta.env.VITE_APP_CURRENCY;
-    const car = dummyCarData.find(car => car._id === id);
+    const [car, setCar] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        try {
+            const { data } = await axios.post('/api/bookings/create', {
+                car: id,
+                pickupDate,
+                returnDate
+            });
+
+            if (data.success) {
+                toast.success(data.message);
+                navigate('/my-bookings');
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     };
+
+    useEffect(() => {
+        setCar(cars.find((car) => car._id === id));
+    }, [cars, id]);
 
     return car ? (
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
@@ -72,9 +94,7 @@ const CarDetails = () => {
                                         <img src={icon} alt="" className="h-6 w-auto opacity-80" />
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {value}
-                                        </p>
+                                        <p className="text-sm font-semibold text-gray-800">{value}</p>
                                     </div>
                                 </div>
                             ))}
@@ -84,21 +104,15 @@ const CarDetails = () => {
 
                         {/* Description */}
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Description
-                            </h2>
-                            <p className="text-gray-600 leading-relaxed text-lg">
-                                {car.description}
-                            </p>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">Description</h2>
+                            <p className="text-gray-600 leading-relaxed text-lg">{car.description}</p>
                         </div>
 
                         <hr className="border-gray-100" />
 
                         {/* Features */}
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Features
-                            </h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">Features</h2>
                             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                                 {[
                                     "360 Camera",
@@ -109,10 +123,7 @@ const CarDetails = () => {
                                     "Adaptive Cruise Control",
                                     "Apple CarPlay / Android Auto"
                                 ].map((item) => (
-                                    <li
-                                        key={item}
-                                        className="flex items-center text-gray-600 py-2"
-                                    >
+                                    <li key={item} className="flex items-center text-gray-600 py-2">
                                         <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 flex-shrink-0">
                                             <img
                                                 src={assets.check_icon || assets.tick_icon}
@@ -134,7 +145,6 @@ const CarDetails = () => {
                     onSubmit={handleSubmit}
                     className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 sticky top-24 h-fit rounded-2xl p-6 lg:p-8 space-y-6"
                 >
-
                     <div className="flex items-baseline justify-between mb-4">
                         <span className="text-3xl font-bold text-gray-900">
                             {currency} {car.pricePerDay}
@@ -149,6 +159,8 @@ const CarDetails = () => {
                             </label>
                             <div className="relative">
                                 <input
+                                    value={pickupDate}
+                                    onChange={(e) => setPickupDate(e.target.value)}
                                     type="date"
                                     id="pickup-date"
                                     className="w-full bg-gray-50 border border-gray-100 px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700"
@@ -164,6 +176,8 @@ const CarDetails = () => {
                             </label>
                             <div className="relative">
                                 <input
+                                    value={returnDate}
+                                    onChange={(e) => setReturnDate(e.target.value)}
                                     type="date"
                                     id="return-date"
                                     className="w-full bg-gray-50 border border-gray-100 px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700"
@@ -180,7 +194,6 @@ const CarDetails = () => {
                     <div className="text-center text-xs text-gray-400 font-medium mt-4">
                         No credit card required to reserve
                     </div>
-
                 </form>
 
             </div>

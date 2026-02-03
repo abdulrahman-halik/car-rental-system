@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Title from '../components/Title';
 import CarCard from '../components/CarCard';
-import { assets, dummyCarData } from '../assets/assets';
+import { assets } from '../assets/assets';
+import { toast } from 'react-hot-toast';
+import { useSearchParams } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 const Cars = () => {
 
-    const [input, setInput] = useState('');
-    const [sortType, setSortType] = useState('relevant');
+    const [searchParams] = useSearchParams();
+    const pickupLocation = searchParams.get('pickupLocation');
+    const pickupDate = searchParams.get('pickupDate');
+    const returnDate = searchParams.get('returnDate');
 
-    const getSortedCars = () => {
-        let sorted = [...dummyCarData];
-        if (sortType === 'low-high') {
-            sorted.sort((a, b) => a.price - b.price);
-        } else if (sortType === 'high-low') {
-            sorted.sort((a, b) => b.price - a.price);
+    const { cars, axios } = useAppContext();
+
+    const [input, setInput] = useState('');
+    const [filterCars, setFilterCars] = useState([]);
+
+    const isSearchData = pickupLocation && pickupDate && returnDate;
+
+    const applyFilters = async () => {
+        if (input === '') {
+            setFilterCars(cars);
+            return null;
         }
-        return sorted;
+
+        const filtered = cars.slice().filter((car) => {
+            return (
+                car.brand.toLowerCase().includes(input.toLowerCase()) ||
+                car.model.toLowerCase().includes(input.toLowerCase()) ||
+                car.category.toLowerCase().includes(input.toLowerCase()) ||
+                car.transmission.toLowerCase().includes(input.toLowerCase())
+            );
+        });
+
+        setFilterCars(filtered);
     };
+
+    const searchCarAvailability = async () => {
+        const { data } = await axios.post(
+            '/api/bookings/check-availability',
+            {
+                location: pickupLocation,
+                pickupDate,
+                returnDate
+            }
+        );
+
+        if (data.success) {
+            setFilterCars(data.availableCars);
+
+            if (data.availableCars.length === 0) {
+                toast.error('No cars available for the selected dates');
+            }
+
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        isSearchData && searchCarAvailability();
+    }, []);
+
+    useEffect(() => {
+        cars.length > 0 && !isSearchData && applyFilters();
+    }, [input]);
 
     return (
         <div>
@@ -35,9 +84,9 @@ const Cars = () => {
                     />
 
                     <input
-                        onChange={(e) => setInput(e.target.value)}
-                        value={input}
                         type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
                         placeholder="Search by make, model or features"
                         aria-label="Search cars"
                         className="w-full h-full outline-none text-gray-700 placeholder-gray-400 text-sm"
@@ -53,16 +102,16 @@ const Cars = () => {
 
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-                {/* Header Section: Count & Sort */}
+                {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                     <p className="text-gray-500 font-medium tracking-wide uppercase text-xs sm:text-sm">
-                        Showing {dummyCarData.length} cars
+                        Showing {filterCars.length} cars
                     </p>
 
                     <div className="flex items-center gap-2">
                         <span className="text-gray-500 text-sm">Sort by:</span>
+
                         <select
-                            onChange={(e) => setSortType(e.target.value)}
                             className="border-none outline-none text-sm font-semibold text-gray-900 bg-transparent cursor-pointer hover:text-primary transition-colors"
                         >
                             <option value="relevant">Recommended</option>
@@ -74,12 +123,13 @@ const Cars = () => {
 
                 {/* Car Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {getSortedCars().map((car, index) => (
+                    {filterCars.map((car, index) => (
                         <div key={index}>
                             <CarCard car={car} />
                         </div>
                     ))}
                 </div>
+
             </div>
 
         </div>

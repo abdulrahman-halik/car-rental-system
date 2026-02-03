@@ -1,11 +1,31 @@
 import React, { useState } from "react";
 import { assets, menuLinks } from "../assets/assets";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
-const Navbar = ({ setShowLogin }) => {
+const Navbar = () => {
+  const { setShowLogin, user, logout, isOwner, axios, setIsOwner } =
+    useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const changeRole = async () => {
+    try{
+     const {data} = await axios.post("/api/owner/change-role")
+     if(data.success){
+      setIsOwner(true);
+      toast.success(data.message)
+     }
+     else{
+      toast.error(data.message)
+     }
+    }
+    catch(err){
+      toast.error(err.message)
+    }
+  }
 
   return (
     <div
@@ -14,13 +34,12 @@ const Navbar = ({ setShowLogin }) => {
     >
       {/* NAVBAR BAR */}
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 text-gray-600">
-
         {/* LOGO */}
         <Link to="/" className="flex items-center gap-0 group">
           <img
             src={assets.logo}
             alt="Rent a Car Logo"
-            className="w-10 md:w-12 h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-10 md:w-12 object-contain block relative right-[8px]"
           />
           <span className="text-2xl font-semibold text-heading tracking-tight ml-[-5px] transition-colors duration-300 group-hover:text-primary ">
             Rent a Car
@@ -53,13 +72,17 @@ const Navbar = ({ setShowLogin }) => {
           </div>
 
           {/* Buttons */}
-          <button onClick={() => navigate("/owner")} className="cursor-pointer">Dashboard</button>
+          <button onClick={() => isOwner ? navigate("/owner"): changeRole()} className="cursor-pointer">
+            {isOwner ? "  Dashboard" : "List cars"}
+          </button>
 
           <button
-            onClick={() => setShowLogin(true)}
+            onClick={() => {
+              user ? logout() : setShowLogin(true);
+            }}
             className="cursor-pointer px-6 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-lg"
           >
-            Login
+            {user ? "Logout" : "Login"}
           </button>
         </div>
 

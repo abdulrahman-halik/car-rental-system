@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { assets, cityList } from '../assets/assets';
+import { useAppContext } from '../context/AppContext';
 
 const Hero = () => {
 
     const [pickupLocation, setPickupLocation] = useState('');
+
+    const { pickupDate, setPickupDate, returnDate, setReturnDate, navigate } = useAppContext();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        navigate(`/car? pickupLocation=${pickupLocation}&pickupDate=${pickupDate}&returnDate=${returnDate}`);
+    }
 
     return (
         <div className="flex flex-col items-center justify-center pt-20 pb-0 bg-light bg-[url('/bg_pattern.png')] bg-cover bg-no-repeat overflow-hidden">
@@ -20,6 +28,7 @@ const Hero = () => {
 
             {/* Search Bar */}
             <form
+                onSubmit={handleSearch}
                 className="
                     flex flex-col md:flex-row
                     items-center
@@ -63,6 +72,8 @@ const Hero = () => {
                         <img src={assets.calendar_icon || assets.search_icon} alt="cal" className="w-4 h-4 opacity-50" />
                         {/* Fallback to search icon if calendar not in assets, checking assets next... assuming calendar exists or using type date icon */}
                         <input
+                            value={pickupDate}
+                            onChange={(e) => setPickupDate(e.target.value)}
                             type="date"
                             min={new Date().toISOString().split('T')[0]}
                             className="text-gray-700 font-medium outline-none w-full"
@@ -77,6 +88,8 @@ const Hero = () => {
                     <div className="flex items-center gap-2">
                         <img src={assets.calendar_icon || assets.search_icon} alt="cal" className="w-4 h-4 opacity-50" />
                         <input
+                            value={returnDate}
+                            onChange={(e) => setReturnDate(e.target.value)}
                             type="date"
                             className="text-gray-700 font-medium outline-none w-full"
                             required

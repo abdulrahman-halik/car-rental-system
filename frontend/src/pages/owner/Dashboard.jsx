@@ -1,18 +1,50 @@
-import React from 'react';
-import { assets, dummyDashboardData } from '../../assets/assets';
-import Title from '../../components/owner/Title';
+import React, { useState, useEffect } from 'react';
+import { assets } from '../../assets/assets';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
-    const currency = import.meta.env.VITE_CURRENCY;
+    const { axios, isOwner, currency } = useAppContext()
 
-    const data = dummyDashboardData;
 
+    const [data, setData] = useState({
+        totalCars: 0,
+        totalBookings: 0,
+        pendingBookings: 0,
+        completedBookings: 0,
+        recentBookings: [],
+        monthlyRevenue: 0,
+        totalRevenue: 0,
+        availableCars: 0,
+        rentedCars: 0,
+    })
+
+    const activePercentage = data.totalCars > 0 ? Math.round((data.rentedCars / data.totalCars) * 100) : 0;
     const dashboardCards = [
         { title: 'Total Cars', value: data.totalCars, icon: assets.carIconColored, bg: 'bg-blue-50' },
         { title: 'Total Bookings', value: data.totalBookings, icon: assets.listIconColored, bg: 'bg-indigo-50' },
         { title: 'Pending', value: data.pendingBookings, icon: assets.cautionIconColored, bg: 'bg-orange-50' },
         { title: 'Confirmed', value: data.completedBookings, icon: assets.tick_icon, bg: 'bg-emerald-50' },
     ];
+
+    const fetchDashboardData = async () => {
+        try {
+            const { data } = await axios.get('/api/owner/dashboard')
+            if (data.success) {
+                setData(data.dashboardData)
+            }
+            else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    useEffect(() => {
+        if (isOwner) {
+            fetchDashboardData()
+        }
+    }, [isOwner])
 
     return (
         <div className="flex-1 w-full bg-gray-50 min-h-screen px-4 md:px-10 pt-10 pb-12 font-outfit">
@@ -150,7 +182,7 @@ const Dashboard = () => {
                             <div className="flex items-center gap-3 mb-1">
                                 <span className="text-3xl font-bold text-gray-900">{currency} {data.monthlyRevenue.toLocaleString()}</span>
                                 <span className="text-sm font-bold text-emerald-500 bg-transparent flex items-center">
-                                    <span className="text-lg mr-0.5">↑</span> 12%
+                                    <span className="text-lg mr-0.5">↑</span> 0%
                                 </span>
                             </div>
                             <p className="text-xs text-gray-500 mb-6">Compared to last month</p>
@@ -158,7 +190,7 @@ const Dashboard = () => {
 
                         {/* Progress Bar */}
                         <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                            <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '70%' }}></div>
+                            <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '0%' }}></div>
                         </div>
                     </div>
 
@@ -178,7 +210,7 @@ const Dashboard = () => {
                                     />
                                     <path
                                         className="text-blue-600"
-                                        strokeDasharray="75, 100"
+                                        strokeDasharray={`${activePercentage}, 100`}
                                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                         fill="none"
                                         stroke="currentColor"
@@ -187,7 +219,7 @@ const Dashboard = () => {
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-gray-900">75%</span>
+                                    <span className="text-3xl font-bold text-gray-900">{activePercentage}%</span>
                                     <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Active</span>
                                 </div>
                             </div>
@@ -198,14 +230,14 @@ const Dashboard = () => {
                                 <span className="w-3 h-3 rounded-full bg-blue-600"></span>
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-gray-900">Rented</span>
-                                    <span className="text-[10px] text-gray-500">3 Cars</span>
+                                    <span className="text-[10px] text-gray-500">{data.rentedCars} Car{data.rentedCars !== 1 ? 's' : ''}</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="w-3 h-3 rounded-full bg-gray-200"></span>
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-gray-900">Available</span>
-                                    <span className="text-[10px] text-gray-500">1 Car</span>
+                                    <span className="text-[10px] text-gray-500">{data.availableCars} Car{data.availableCars !== 1 ? 's' : ''}</span>
                                 </div>
                             </div>
                         </div>
