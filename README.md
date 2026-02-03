@@ -29,7 +29,7 @@ A comprehensive web application for renting cars, connecting car owners with cus
 *   **MongoDB** & **Mongoose** (Database & ODM)
 *   **ImageKit** (Image Storage)
 *   **JWT** (Authentication)
-*   **BCrypt** (Security)
+*   **bcrypt** (Security)
 *   **Multer** (File Uploads)
 
 ## Project Structure
